@@ -1,7 +1,7 @@
 KLA - K. Log Analyzer
 =============================
 
-A log analyzer & web-based browser for K client logs.
+A log analyzer & web-based browser for K logs.
 
 Prerequisites
 -------------

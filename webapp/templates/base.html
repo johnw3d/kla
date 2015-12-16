@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}KLA{% block subtitle %}{% end %}{% end %}</title>
+        <meta name="description" content="KLA">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+        <!-- Compiled custom + bootstrap less -->
+        <link rel="stylesheet" type="text/css" href="/static/dist/everything.css"/>
+        <!-- jquery-ui -->
+        <link rel="stylesheet" href="/static/dist/jquery-ui.min.css">
+
+        {% block js %}{% end %}
+    </head>
+
+    <body class="{% block body_class %}{% end %}">
+        {% block body %}
+            <div class="container">
+                <div class="row">
+                    {% block nav_bar %}
+                        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+                            <div class="container">
+                                {% block nav_bar_content %}
+                                {% end %}
+                            </div>
+                        </nav>
+                    {% end %}
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 left-col">
+                        {% block left_col %}
+                            <div data-spy="affix">
+                                <i class="fa fa-slack fa-3x app-logo"></i>
+                                <ul class="list-unstyled main-menu">
+                                    <li><a href="/">All threads</a></li>
+                                    <li><a href="/johnm">My threads</a></li>
+                                    <li><a href="/something">Something</a></li>
+                                    <li><a href="/else">Another</a></li>
+                                    <li><a href="/lastone">Last one</a></li>
+                                </ul>
+                                <ul class="list-unstyled user-menu">
+                                    {% if current_user %}
+                                        <li>@{{ current_user['username'] }}</li>
+                                        <li><a href="/logout">Log out</a></li>
+                                    {% else %}
+                                        <li>Not logged in</li>
+                                        <li><a href="/login">Login</a></li>
+                                    {% end %}
+                                </ul>
+                            </div>
+                        {% end %}
+                    </div>
+                    <div class="col-sm-9 main-col">
+                        {% block main_col %}<p>Main</p>{% end %}
+                    </div>
+                </div>
+            </div>
+        {% end %}
+
+        <script src="/static/dist/jquery.js"></script>  <!-- HEY, make this -min.js in prod -->
+        <script src="/static/dist/jquery-ui.min.js"></script>
+        <script src="/static/dist/bootstrap.min.js"></script>
+
+        {% block page_scripts %}{% end %}
+    </body>
+</html>

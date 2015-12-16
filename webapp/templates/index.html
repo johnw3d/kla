@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block nav_bar_content %}
+<div class="row" xmlns="http://www.w3.org/1999/html">
+        <div class="col-sm-3 left-col">
+            <button type="button" class="btn btn-link btn-sm navbar-btn" title="Add a Fold">
+                <!-- <span class="glyphicon glyphicon-star"></span> Star -->
+                <i id="add-fold-button" class="fa fa-lg fa-plus"></i>
+            </button>
+            <span class="navbar-right">
+                <button type="button" class="btn btn-link btn-sm navbar-btn" title="Search folds">
+                    <i class="fa fa-lg fa-search"></i>
+                </button>
+                <button type="button" class="btn btn-link btn-sm navbar-btn">
+                    <i class="fa fa-lg fa-bars"></i>
+                </button>
+            </span>
+        </div>
+        <div class="col-sm-9 main-col">
+            <span class="dropdown navbar-btn">
+              <button class="btn btn-link btn-sm dropdown-toggle" type="button" id="foldMenu1" data-toggle="dropdown">
+                <i id="add-to-fold-button" class="fa fa-lg fa-plus"></i>
+                <!--span class="caret"></span-->
+              </button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="foldMenu1">
+                <li><a id="add-a-link-link" href="#">Add a link</a></li>
+                <li><a id="add-a-post-link" href="#">Add a post</a></li>
+                <li><a id="add-a-feed-link" href="#">Add a feed</a></li>
+              </ul>
+            </span>
+            <button type="button" class="btn btn-link btn-sm navbar-btn navbar-right">
+                <!-- <span class="glyphicon glyphicon-star"></span> Star -->
+                <i class="fa fa-lg fa-bars"></i>
+            </button>
+        </div>
+    </div>
+{% end %}
+
+{% block left_col %}
+    <div data-spy="affix">
+        <i class="fa fa-slack fa-3x app-logo"></i>
+        <div id="directory-tree">
+            {% include "directory_tree.html" %}
+        </div>
+    </div>
+{% end %}
+
+{% block main_col %}
+    <div id="main-col">
+        <i style="color:#bbb">... add or select a feed ...</i>
+    </div>
+{% end %}
+
+{% block page_scripts %}
+    <script src="/static/dist/threadery.js"></script>
+    <script src="/static/dist/jquery.timeout.min.js"></script>
+{% end %}
+
+

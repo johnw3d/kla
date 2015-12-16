@@ -6,29 +6,15 @@ __author__ = 'johnw'
 import os, sys
 import logging
 
-from flask import Flask
-
 import settings
+from webapp.handlers.main import run_dev_server
 
 log = logging.getLogger('app')
 
-# instantiate Flask app
-kla = Flask(__name__)
-
-@kla.route("/")
-def hello():
-    return "Hello World!"
-
-if __name__ == "__main__":
-    app.run()
-
-
-
 def main(argv):
-    "kla main, start kla webapp"
+    "kla main, start kla dev webapp"
 
-    kla.run(host='0.0.0.0', port=9000, debug=True)
-
+    run_dev_server()
 
 # ----------  command-line processor -------
 
@@ -38,7 +24,7 @@ CMDS = {
 
 if __name__ == "__main__":
     # config logging
-    logging.basicConfig(filename=os.path.join(settings.LOGS.LOG_ROOT, 'app.log'), filemode='a',
+    logging.basicConfig(filename=os.path.join(settings.LOGS.LOG_ROOT, 'kla.log'), filemode='a',
                     level=settings.LOGS.LOG_LEVEL, format=settings.LOGS.LOG_FORMAT)
     # dispatch cmd
     if len(sys.argv) > 1:

@@ -14,6 +14,15 @@ APP = settings(
 )
 
 FLASK = settings(
+    app = settings(
+        static_path = '/static',
+        static_folder = 'webapp/static',
+        template_folder = 'webapp/templates'),
+    run = settings(
+        host = '0.0.0.0',
+        port = 9000,
+        debug = True
+    )
 )
 
 ELASTIC_SEARCH = settings(
@@ -22,7 +31,7 @@ ELASTIC_SEARCH = settings(
 )
 
 LOGS = settings(
-    LOG_ROOT = os.environ.get('THREADERY_LOG_ROOT', '/var/log/threadery'),
+    LOG_ROOT = os.environ.get('THREADERY_LOG_ROOT', '/var/log/kla'),
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
