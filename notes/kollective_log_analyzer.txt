@@ -1,0 +1,41 @@
+Kollective Log Analyzer - client log analyzer (initially)
+-----------------------
+
+- since logs can easily include entries for multiple downloads, initialization, pref polling, need an initial pass that
+  does basic task association and field extraction, then apply rules sets separately to each task.
+- for now, assume this parsing be dumped into a (JSONable?) structured namespace, with something like the following top-
+  level structure:
+    startup
+    prefPoll
+    download
+    discovery
+    reporting
+- since there are multiple possible instances of each task type, need a way of detecting start & end and indexing them,
+  possibly via a state variable kept in each task as parsing proceeds plus sets of start & end patterns, indexing field
+  if any (otherwise ordinal)
+- parsing driven by an RE-based pattern definition that includes task name, indexing scheme, etc.
+    {
+        "startup.init": {  # label names task (or dotted-pathname subtask), multiple tasks can have matching patterns
+            "start": [ r'xxxxxx', r'yyyyyy', ],   # alternate start patterns (optional, if not present all matching are in the singleton task)
+            "end":  [ r'xxxxxx', r'yyyyyy', ],   # alternate end patterns (optional)
+            "patterns": [ r'xxxxxx', r'yyyyyyy',
+                r'...(?P<x.y.z>...)...',  # named subpatterns extracted to fields under task, '.' are structure levels in the extract
+                                          # field namespace (they are converted internally to '__' to be valid re group names)
+                r'...{{x.y.z}}...' ],  # {{}} bounded subpatterns match contents of named field in parse namespace
+            "indexFields": [ 'thread', moid' ],   # list of fields that index this task in presence of multiple task instances
+        },
+        ...
+    }
+
+    The {{}}-bounded subpatterns are re-inserted in the master patterns whenever they are changed in the namespace.  Names
+    in these can begin with '.' which means an absolute, fully-specified field pathanme; those without the leading '.'
+    are relative to the current task or subtask.
+
+    Indexing
+
+    One tricky bit will be disambiguating log lines for multiple instances of tasks, say downloads or pref-polling.  In some cases,
+    the index is obvious, say the format moid on the log line, in other case, much less so.  One distinguishing aid might be the
+    thread ID, such that a task start pattern found on a given thread indicates that task continues on that thread (at least) until
+    an end or another start pattern.  Actually, 'thread' is a field in all patterns, so can just use it in the 'indexFields' field
+    list.  The indexFields field list is a disjunction of possible index values, if any are found
+

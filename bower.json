@@ -1,0 +1,19 @@
+{
+  "name": "kla",
+  "version": "0.0.1",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "jquery": "~2.1.4",
+    "jquery-ui": "~1.11.4",
+    "font-awesome": "~4.5.0",
+    "jsTree": "vakata/jstree#~3.2.1"
+  }
+}

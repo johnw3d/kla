@@ -1,0 +1,30 @@
+{ network: {
+	ipconfig: {
+		timestamp: 555,
+		00: {
+			adapter: {
+				timestamp: 666,
+				00: {
+					timestamp: 777,
+					name: "foo",
+					description: "baz"
+					},
+				01: {
+					name: "bar",
+					description: "whack"
+					},
+				02: {
+					...
+					}
+				}
+			}
+		01: {
+			adapter: {
+				00: {
+					...
+					},
+				}
+			}
+		}
+	}
+}
