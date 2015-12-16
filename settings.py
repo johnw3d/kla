@@ -1,6 +1,4 @@
-#  settings.py - threadery app settings
-#
-# Copyright (c) John Wainwright 2014 - All rights reserved.
+#  settings.py - kla app settings
 #
 __author__ = 'johnw'
 
@@ -15,23 +13,12 @@ APP = settings(
     port = 9001,
 )
 
-TORNADO = settings(
-    template_path=os.path.join(os.path.dirname(__file__), "templates"),
-    static_path=os.path.join(os.path.dirname(__file__), "static"),
-    twitter_consumer_key = 'jHkeUDDo4iOy3EE0pUtJgTu1z',
-    twitter_consumer_secret = 'qIAIWQmO0ij7mAhm2QEfVRol9SfPbn8X86jlW2Jdd7qIggkBhA',
-    cookie_secret = "8hfh8ry8883jdj9lcbboh7d8920jdbckjsg9266111hgsree",
-    login_url = "/login",
-    debug = True,
-    serve_traceback = True,
-    # xsrf_cookies = True,
+FLASK = settings(
 )
 
-THREADSTORE = settings(
-    host = 'local-api.threadstore.net',
-    port = 8888,
-    client_settings = {},
-    request_settings = {},
+ELASTIC_SEARCH = settings(
+    host = 'tc1-elk.esjc.kontiki.com',
+    port = 9200,
 )
 
 LOGS = settings(

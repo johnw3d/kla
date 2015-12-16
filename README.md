@@ -1,7 +1,7 @@
-Threadery
-=============
+KLA - K. Log Analyzer
+=============================
 
-A combo feedreader/social-bookmarker/social-news app based on ThreadStore.
+A log analyzer & web-based browser for K client logs.
 
 Prerequisites
 -------------
@@ -24,20 +24,20 @@ Getting started
 
 Recommended env vars:
 
-	THREADERY_ROOT=/Users/john/Projects/threadery
-	THREADERY_LOCAL=1
+	KLA_ROOT=<projects_dir>/kla
+	KLA_LOCAL=1
 
 Create log and cached asset dirs and make them writeable:
 
-    mkdir /var/log/threadery
-    chgrp staff /var/log/threadery
-    chmod 775 /var/log/threadery
+    mkdir /var/log/kla
+    chgrp staff /var/log/kla
+    chmod 775 /var/log/kla
 
 Create the virtualenv and install python dependencies:
 
     # install python 3, at least 3.4.1, eg brew install python3
 
-    cd $THREADERY_ROOT
+    cd KLA_ROOT
 	virtualenv --python=<path_to_python3_install>/bin/python3 env   
 	source env/bin/activate
 	pip install -r requirements.txt
@@ -50,7 +50,7 @@ Build CSS and Javascript assets with grunt:
 
     grunt build
 
-Start the Tornado development server:
+Start the Flask development server:
 
     python app.py
 

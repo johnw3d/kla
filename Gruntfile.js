@@ -9,7 +9,7 @@ module.exports = function(grunt) {
           compress: false // true
         },
         files: {
-          "./static/dist/kla.css": "./static/less/kla.less"
+          "./webapp/static/dist/kla.css": "./webapp/static/less/kla.less"
         }
       }
     },
@@ -32,17 +32,17 @@ module.exports = function(grunt) {
               //'jsTree/dist/jstree.min.js'
               'jsTree/dist/jstree.js'  // for dev
             ],
-            dest: './static/dist/',
+            dest: './webapp/static/dist/',
             filter: 'isFile',
             flatten: true
           },
           {
             expand: true,
-            cwd: 'static/js/',
+            cwd: 'webapp/static/js/',
             src: [
               'kla.js',
             ],
-            dest: './static/dist/',
+            dest: './webapp/static/dist/',
             filter: 'isFile',
             flatten: true
           }
@@ -50,18 +50,18 @@ module.exports = function(grunt) {
       }
     },
 
-    clean: ['./static/dist'],
+    clean: ['./webapp/static/dist'],
 
     watch: {
       less: {
-        files: ['./static/less/*.less'], //watched files
+        files: ['./webapp/static/less/*.less'], //watched files
         tasks: ['less'], //tasks to run
         options: {
           livereload: true
         }
       },
       js: {
-        files: ['./static/js/*.js'], //watched files
+        files: ['./webapp/static/js/*.js'], //watched files
         tasks: ['copy'], //tasks to run
         options: {
           livereload: true
