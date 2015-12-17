@@ -37,11 +37,16 @@ def index():
             nodelist = []
             for k in sorted(tree.keys()):
                 v = tree[k]
-                if isinstance(v, (dict, list)):
+                if isinstance(v, dict):
+                    if any(isinstance(i, (dict, list)) for i in v.values()):
+                        # non-leafs, recurse
+                        nodelist.append(dict(text=k, children=_renderParseTree(v)))
+                elif isinstance(v, list):
                     nodelist.append(dict(text=k, children=_renderParseTree(v)))
                 else:
-                    nodelist.append(
+                    nodelist.append()
 
+    allLeafs = not any(isinstance(v, (dict, list)) for v in tree.values())
 
     return render_template("index.html")
 
