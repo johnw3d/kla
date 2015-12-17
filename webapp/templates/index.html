@@ -34,26 +34,29 @@
             </button>
         </div>
     </div>
-{% end %}
+{% endblock %}
 
 {% block left_col %}
     <div data-spy="affix">
         <i class="fa fa-slack fa-3x app-logo"></i>
         <div id="directory-tree">
-            {% include "directory_tree.html" %}
+            directory tree goes here
         </div>
     </div>
-{% end %}
+{% endblock %}
 
 {% block main_col %}
     <div id="main-col">
         <i style="color:#bbb">... add or select a feed ...</i>
     </div>
-{% end %}
+{% endblock %}
+
+{% block js %}
+    <script src="/static/dist/jstree.js"></script>
+{% endblock %}
 
 {% block page_scripts %}
-    <script src="/static/dist/threadery.js"></script>
-    <script src="/static/dist/jquery.timeout.min.js"></script>
-{% end %}
+    <script src="/static/dist/kla.js"></script>
+{% endblock %}
 
 

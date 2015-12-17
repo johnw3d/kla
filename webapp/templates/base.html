@@ -2,19 +2,19 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %}KLA{% block subtitle %}{% end %}{% end %}</title>
+        <title>{% block title %}KLA{% block subtitle %}{% endblock %}{% endblock %}</title>
         <meta name="description" content="KLA">
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
         <!-- Compiled custom + bootstrap less -->
-        <link rel="stylesheet" type="text/css" href="/static/dist/everything.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/dist/kla.css"/>
         <!-- jquery-ui -->
         <link rel="stylesheet" href="/static/dist/jquery-ui.min.css">
 
-        {% block js %}{% end %}
+        {% block js %}{% endblock %}
     </head>
 
-    <body class="{% block body_class %}{% end %}">
+    <body class="{% block body_class %}{% endblock %}">
         {% block body %}
             <div class="container">
                 <div class="row">
@@ -22,10 +22,10 @@
                         <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
                             <div class="container">
                                 {% block nav_bar_content %}
-                                {% end %}
+                                {% endblock %}
                             </div>
                         </nav>
-                    {% end %}
+                    {% endblock %}
                 </div>
                 <div class="row">
                     <div class="col-sm-3 left-col">
@@ -46,22 +46,22 @@
                                     {% else %}
                                         <li>Not logged in</li>
                                         <li><a href="/login">Login</a></li>
-                                    {% end %}
+                                    {% endif %}
                                 </ul>
                             </div>
-                        {% end %}
+                        {% endblock %}
                     </div>
                     <div class="col-sm-9 main-col">
-                        {% block main_col %}<p>Main</p>{% end %}
+                        {% block main_col %}<p>Main</p>{% endblock %}
                     </div>
                 </div>
             </div>
-        {% end %}
+        {% endblock %}
 
         <script src="/static/dist/jquery.js"></script>  <!-- HEY, make this -min.js in prod -->
         <script src="/static/dist/jquery-ui.min.js"></script>
         <script src="/static/dist/bootstrap.min.js"></script>
 
-        {% block page_scripts %}{% end %}
+        {% block page_scripts %}{% endblock %}
     </body>
 </html>
