@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block styles %}
-    <link rel="stylesheet" type="text/css" href="/static/dist/jstree/themes/default/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/dist/jstree/themes/proton/style.css"/>
 {% endblock %}
 
 {% block nav_bar_content %}
@@ -41,7 +41,7 @@
 {% endblock %}
 
 {% block left_col %}
-    <div data-spy="affix">
+    <div > <!--data-spy="affix"> -->
         <i class="fa fa-slack fa-3x app-logo"></i>
         <div id="directory-tree">
             directory tree goes here
@@ -51,7 +51,6 @@
 
 {% block main_col %}
     <div id="main-col">
-        <i style="color:#bbb">... add or select a feed ...</i>
     </div>
 {% endblock %}
 
@@ -64,8 +63,18 @@
         function loadParseTree(treeID, data) {
             $(treeID).jstree(
                     {
-                        'core': {'data': data}
+                        'core': {
+                            'data': data,
+                            'themes': {
+                                'name': 'proton',
+                                'responsive': true
+                            }
+                        }
                     });
+            // set up click handlers
+            $(treeID).on("select_node.jstree", function (e, data) {
+                console.log(data);
+            });
         }
 
         $(window).load(function() {
