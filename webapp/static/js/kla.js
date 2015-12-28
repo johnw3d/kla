@@ -4,12 +4,6 @@
  */
 
 
-$(window).load(function() {
-    $(function () {
-    });
-});
-
-
 // ------ various utils --------
 
 if (!String.prototype.format) {

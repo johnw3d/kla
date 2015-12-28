@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="/static/dist/jstree/themes/default/style.css"/>
+{% endblock %}
+
 {% block nav_bar_content %}
 <div class="row" xmlns="http://www.w3.org/1999/html">
         <div class="col-sm-3 left-col">
@@ -51,12 +55,26 @@
     </div>
 {% endblock %}
 
-{% block js %}
-    <script src="/static/dist/jstree.js"></script>
-{% endblock %}
-
 {% block page_scripts %}
+    <script src="/static/dist/jstree.js"></script>
     <script src="/static/dist/kla.js"></script>
+    <script>
+        var treeData = {{ renderedParseTree|safe }};
+
+        function loadParseTree(treeID, data) {
+            $(treeID).jstree(
+                    {
+                        'core': {'data': data}
+                    });
+        }
+
+        $(window).load(function() {
+            $(function () {
+                loadParseTree("#directory-tree", treeData);
+            });
+        });
+    </script>
+
 {% endblock %}
 
 

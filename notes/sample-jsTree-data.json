@@ -1,0 +1,45 @@
+[
+	{ "text": "Network", 
+	  "children": [
+		{ "text": "IPConfig", 
+		  "labels": [ "defaultGatewayIndex", "foundBroadBand", "module", "etc" ], 
+		  "rows": [
+		  	[ 29, 1440K, "IPCONFIG", "etc" ],
+		  	[ 29, 1330K, "IPCONFIG", "etc" ]
+		  ],
+		  "children": [
+			  { "text": "Nov 24 19:34:10", 
+				"labels": [ "defaultGatewayIndex", "foundBroadBand", "module", "etc" ], 
+				"rows": [
+					[ 29, 1440K, "IPCONFIG", "etc" ],
+				],
+				"children": [
+					{ "text": "adapters", 
+					  "labels": ["description", "name", "type", "etc"],
+					  "rows": [
+					  	[ "[Bluetooth Device]", "c02d478b-10f3", "NCF_VIRTUAL" ],					  	
+					  	[ "[WiFi Miniport Adapter]", "c02d478b-10f3", "NCF_PHYSICAL" ],
+					  	[ "[Wireless-N WLAN]", "c02d478b-10f3", "NCF_VIRTUAL" ],
+					  	[ "[VPN Adapter]", "c02d478b-10f3", "NCF_VIRTUAL" ]
+					  ]
+					},
+					{ "text": "interfaces",
+					  "labels": ["index", "isRunning", "mtu", "speed", "etc"],
+					  "rows": [
+					  	[ 14, 0, 0, 0 ],					  	
+					  	[ 19, 1, 1500, "1MB", "etc" ]
+					  ]
+					}
+				]
+			}]
+		}]
+	},
+	{ "text": "peer",
+	  "labels": [ "kdpPort", "nodeID", "etc" ],
+	  "rows": [
+	  	[ 1947, "pDTHFT", "54fc" ]
+	  ]
+	}
+]
+					
+					  	
