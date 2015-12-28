@@ -21,6 +21,9 @@ def run_dev_server():
 
 # -------- main request handlers --------
 
+parser = None
+nodeData = {}
+
 @kla.route('/')
 def index():
     #
@@ -29,19 +32,27 @@ def index():
     from parser.patterns.clientLog import patternDef
     import os
     #
-    p = Parser(os.path.expanduser("~/Dropbox/Documents/Kontiki 2014/debugging/Lloyds/pDPTu3_AT2k1-20151125-204429/error2.log"), patternDef)
-    p.parse()
+    global parser, nodeData
+    parser = Parser(os.path.expanduser("~/Dropbox/Documents/Kontiki 2014/debugging/Lloyds/pDPTu3_AT2k1-20151125-204429/error2.log"), patternDef)
+    parser.parse()
     #
+
+    def _getLabels(child):
+        return nodeData[child["id"]]["labels"]
+
+    def _getRows(child):
+        return nodeData[child["id"]]["rows"]
 
     def _mergeTableData(child, labelIndexes, labels, rows):
         "merges child labels & row into parent labels & rows"
-        newLabels = set(child['labels']) - set(labels)
+        childLabels, childRows = _getLabels(child), _getRows(child)
+        newLabels = set(childLabels) - set(labels)
         for k in sorted(newLabels):
             labelIndexes[k] = len(labels)
             labels.append(k)
         row = [''] * len(labels)
-        for i, k in enumerate(child['labels']):
-            row[labelIndexes[k]] = child['rows'][0][i]
+        for i, k in enumerate(childLabels):
+            row[labelIndexes[k]] = childRows[0][i]
         rows.append(row)
 
     def _renderParseTree(name, level):
@@ -65,7 +76,7 @@ def index():
             for k in sorted(keys):
                 v = level[k]
                 child = _renderParseTree(k, v)
-                if len(row) == 0 and len(child['rows']) == 1:
+                if len(row) == 0 and len(_getRows(child)) == 1:
                     # no leaf-values at this level, accumulate any immediate child singleton rows into my row vector
                     _mergeTableData(child, labelIndexes, labels, rows)
                 children.append(child)
@@ -75,25 +86,28 @@ def index():
                 # list top-level values always dicts
                 timestamp = v.get('timestamp')
                 child = _renderParseTree(timestamp, v)
-                if len(child['rows']) == 1:
+                if len(_getRows(child)) == 1:
                     # no leaf-values at this level, accumulate any immediate child singleton rows into my row vector
                     _mergeTableData(child, labelIndexes, labels, rows)
                 children.append(child)
 
         # build node for this level
-        node = dict(text=name, labels=labels, rows=rows)
+        id = "n_%d" % len(nodeData)
+        node = dict(text=name, id=id)
         if children:
             node['children'] = children
+        # save table data in side dict for later ajax calls
+        nodeData[id] = dict(labels=labels, rows=rows)
         #
         return node
 
     # top-level jsTree roots are children of the top-level parseTree
-    renderedTree = _renderParseTree('top', p.parseTree)['children']
+    renderedTree = _renderParseTree('top', parser.parseTree)['children']
 
     return render_template("index.html",
                            renderedParseTree=json.dumps(renderedTree))
 
-
+# jsTree data format
 #     'core' : {
 #         'data' : [
 #                 {
@@ -112,3 +126,8 @@ def index():
 #     }
 # });
 
+@kla.route('/node/<nodeID>')
+def nodeDataTable(nodeID):
+    "ajax call for table data for IDed node"
+    nd = nodeData.get(nodeID, dict(labels=[], rows=[]))
+    return render_template("node_table.html", labels=nd["labels"], rows=nd["rows"])

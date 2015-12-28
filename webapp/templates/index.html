@@ -60,6 +60,18 @@
     <script>
         var treeData = {{ renderedParseTree|safe }};
 
+        // handle click on parseTree node
+        function nodeClicked(e, data) {
+            $.ajax({
+                url : '/node/' + data.node.id,
+                type: 'GET',
+                success: function(tableHtml){
+                    $('#main-col').html(tableHtml);
+                }
+            });
+        }
+
+        // loads up jsTree node directory
         function loadParseTree(treeID, data) {
             $(treeID).jstree(
                     {
@@ -72,9 +84,7 @@
                         }
                     });
             // set up click handlers
-            $(treeID).on("select_node.jstree", function (e, data) {
-                console.log(data);
-            });
+            $(treeID).on("select_node.jstree", nodeClicked);
         }
 
         $(window).load(function() {
