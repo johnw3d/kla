@@ -50,27 +50,30 @@ def index():
         for k in sorted(newLabels):
             labelIndexes[k] = len(labels)
             labels.append(k)
-        row = [''] * len(labels)
+        row = [0, 0] + [''] * (len(labels)-2)
         for i, k in enumerate(childLabels):
             row[labelIndexes[k]] = childRows[0][i]
         rows.append(row)
 
     def _renderParseTree(name, level):
         "recursive parseTree-to-jsTree data renderer"
-        labelIndexes = {}
-        children, labels, row = [], [], []
-        rows = [row]
+        labelIndexes = dict(startLineNo=0, endLineNo=1, timestamp=2, threadID=3, threadName=4, module=5)
+        children, labels, row, rows = [], ["startLineNo", "endLineNo", "timestamp", "threadID", "threadName", "module"], [0, 0, '', '', '', ''], []
         if isinstance(level, dict):
             # first pass for leaf values
+            rows = [row]
             keys = set(level.keys())
             for k in sorted(keys):
                 v = level[k]
                 if isinstance(v, (dict, list)):
                     continue
                 else:
-                    labelIndexes[k] = len(labels)
-                    labels.append(k)
-                    row.append(v)
+                    if k in labelIndexes:
+                        row[labelIndexes[k]] = v
+                    else:
+                        labelIndexes[k] = len(labels)
+                        labels.append(k)
+                        row.append(v)
                     keys.remove(k)
             # second pass for non-leafs
             for k in sorted(keys):
@@ -78,6 +81,7 @@ def index():
                 child = _renderParseTree(k, v)
                 if len(row) == 0 and len(_getRows(child)) == 1:
                     # no leaf-values at this level, accumulate any immediate child singleton rows into my row vector
+                    rows = []
                     _mergeTableData(child, labelIndexes, labels, rows)
                 children.append(child)
             #
@@ -96,8 +100,14 @@ def index():
         node = dict(text=name, id=id)
         if children:
             node['children'] = children
+        # extract line-no bounds, always first two fields
+        startLineNo = min(row[0] for row in rows)
+        endLineNo = max(row[1] for row in rows)
+        # strip line-no fields  todo: there has to be a cleaner way than this, make lineNo metadata some side structure perhaps??
+        #labels = labels[2:]
+        #rows = [row[2:] for row in rows]
         # save table data in side dict for later ajax calls
-        nodeData[id] = dict(labels=labels, rows=rows)
+        nodeData[id] = dict(labels=labels, rows=rows, startLineNo=startLineNo, endLineNo=endLineNo)
         #
         return node
 
@@ -129,5 +139,10 @@ def index():
 @kla.route('/node/<nodeID>')
 def nodeDataTable(nodeID):
     "ajax call for table data for IDed node"
-    nd = nodeData.get(nodeID, dict(labels=[], rows=[]))
-    return render_template("node_table.html", labels=nd["labels"], rows=nd["rows"])
+    nd = nodeData.get(nodeID, dict(labels=[], rows=[], startLineNo=0, endLineNo=0))
+    return render_template("node_table.html",
+                           labels=nd["labels"],
+                           rows=nd["rows"],
+                           lines='\n'.join(parser.lines[nd["startLineNo"]-1:nd["endLineNo"]]),
+                           upperFirst=lambda x: x[0].upper() + x[1:])
+

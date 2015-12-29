@@ -151,7 +151,7 @@ class PatternSpec(object):
                     compileTasks(subtasks, taskNamePrefix=taskName + ".")
         compileTasks(self.patternDef["tasks"])
 
-    def match(self, line):
+    def match(self, line, lineNo):
         "match line against my patterns"
         # print("\n\n---------\n", line)
         endTask = None
@@ -167,8 +167,9 @@ class PatternSpec(object):
                     self.resetTaskTree(task)
                 if not task or p.isStart:
                     self.tasks[taskName] = task = Task(taskName, self.taskOrdinal[taskName], self.indexFields[taskName], self)
+                    self.parseTree[task.pathPrefix + 'startLineNo'] = lineNo
                     self.taskOrdinal[taskName] += 1
-                print("  match ", taskName, "ordinal", task.ordinal, p.isStart, p.isEnd)
+                #print("  match ", taskName, "ordinal", task.ordinal, p.isStart, p.isEnd)
                 # insert fields into parse-tree
                 for field, val in m.groupdict().items():
                     # figure fully-qualified parseTree pathname
@@ -184,6 +185,7 @@ class PatternSpec(object):
                 if p.isEnd:
                     endTask = task
         if endTask:
+            self.parseTree[endTask.pathPrefix + 'endLineNo'] = lineNo
             self.resetTaskTree(endTask)
 
     def resetTaskTree(self, task):
@@ -200,6 +202,13 @@ class PatternSpec(object):
         _reset(task)
         if task.parent:
             task.parent.removeChild(task)
+
+    def endParse(self, lastLineNo):
+        "clean up at end of parse"
+        # close out any still open tasks
+        for t in self.tasks.values():
+            self.parseTree[t.pathPrefix + 'endLineNo'] = lastLineNo
+
 
 # class PatternManager(object):
 #     """Manages the KLA pattern library"""

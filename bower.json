@@ -14,6 +14,7 @@
     "jquery": "~2.1.4",
     "jquery-ui": "~1.11.4",
     "font-awesome": "~4.5.0",
-    "jsTree": "vakata/jstree#~3.2.1"
+    "jsTree": "vakata/jstree#~3.2.1",
+    "jstree-bootstrap-theme": "orangehill/jstree-bootstrap-theme#~1.0.0"
   }
 }
