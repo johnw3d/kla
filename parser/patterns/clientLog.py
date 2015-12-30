@@ -15,7 +15,7 @@ __author__ = 'john'
 # [54fc]IP config      [Nov 24 19:34:09] IPCONFIG Chars: NCF_VIRTUAL, adding...
 
 patternDef = {
-    "prefix": r'^(\[?(?P<threadID>([a-f0-9]+)|(Th-0))\]?)*(?P<threadName>[a-zA-Z ]+)\[(?P<timestamp>\w+ \d+ \d+:\d+:\d+\])\s*',
+    "prefix": r'^(\[?(?P<threadID>([a-f0-9]+)|(Th-0))\]?)*(?P<threadName>[a-zA-Z ]+)\[(?P<timestamp>\w+ \d+ \d+:\d+:\d+)\]\s*',
     "tasks": {
         "network.IPConfig": {
             "prefix": r'(?P<module>IPCONFIG) ',
@@ -32,7 +32,7 @@ patternDef = {
                         r'Device has invalid status\((?P<invalidStatus>[^)]*)\), (?P<ignored>ignoring)...',
                         r'GetDeviceStatus\(\) failed, (?P<ignored>ignoring)..., (?P<GetDeviceStatus_failed>.*)',
                     ],
-                    "indexFields": ['name']
+                    "indexFields": ['description']
                 },
                 "interfaces": {
                     "prefix": r'(?P<module>IPCONFIG) ',

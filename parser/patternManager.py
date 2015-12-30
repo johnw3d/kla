@@ -107,6 +107,7 @@ class PatternSpec(object):
     def __init__(self, parser, patternDef):
         self.parser = parser
         self.parseTree = parser.parseTree
+        self.nodeMeta = parser.nodeMeta
         self.tasks = {}
         self.taskOrdinal = defaultdict(int)
         self.indexFields = {}
@@ -144,7 +145,7 @@ class PatternSpec(object):
                     for pat in defn.get(k, []):
                         self.patterns.append(Pattern(self.parser, taskPrefix + pat, taskName, isStart=(k == "start"), isEnd=(k == "end")))
                 # record index spec
-                self.indexFields[taskName] = defn.get("indexFields")
+                self.indexFields[taskName] = defn.get("indexFields", [])
                 # recurse into any subtasks
                 subtasks = defn.get("subtasks")
                 if subtasks:
@@ -167,25 +168,27 @@ class PatternSpec(object):
                     self.resetTaskTree(task)
                 if not task or p.isStart:
                     self.tasks[taskName] = task = Task(taskName, self.taskOrdinal[taskName], self.indexFields[taskName], self)
-                    self.parseTree[task.pathPrefix + 'startLineNo'] = lineNo
+                    self.nodeMeta[task.pathPrefix + 'startLineNo'] = lineNo
                     self.taskOrdinal[taskName] += 1
                 #print("  match ", taskName, "ordinal", task.ordinal, p.isStart, p.isEnd)
                 # insert fields into parse-tree
                 for field, val in m.groupdict().items():
                     # figure fully-qualified parseTree pathname
                     pathname = field[1:] if field.startswith('.') else task.pathPrefix + field
+                    if field in task.indexFields:
+                        self.nodeMeta[task.pathPrefix + 'index'] = val
                     try:
                         v = float(val)  # try to convert to a number
                         val = v if '.' in val or 'e' in val else int(v)
                     except:
                         pass
                     self.parseTree[pathname] = val
-                    print("    setting", pathname, "to", val)
+                    #print("    setting", pathname, "to", val)
                 # signal close out current task if task-end pattern found
                 if p.isEnd:
                     endTask = task
         if endTask:
-            self.parseTree[endTask.pathPrefix + 'endLineNo'] = lineNo
+            self.nodeMeta[endTask.pathPrefix + 'endLineNo'] = lineNo
             self.resetTaskTree(endTask)
 
     def resetTaskTree(self, task):

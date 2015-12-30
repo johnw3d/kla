@@ -42,6 +42,7 @@ class Parser(object):
     def __init__(self, logfileName, patternDef):
         self.logfileName = logfileName
         self.parseTree = ParseTree()
+        self.nodeMeta = {} # holds parseTree node metadata keyed by full node pathname
         self.log = None
         # each parser has it's own "compiled" pattern struct as it may contain logfile-specific
         #  {{var}} variable expansions
@@ -84,7 +85,7 @@ class Parser(object):
             # look for keys that are 3-digit ordinals
             if keys:
                 if any(self.ordinalRE.match(k) for k in keys):
-                    if len(keys) == 1:
+                    if False and len(keys) == 1:
                         # single entry, elide level
                         return optimize(subtree[list(keys)[0]])
                     else:

@@ -50,15 +50,16 @@ def index():
         for k in sorted(newLabels):
             labelIndexes[k] = len(labels)
             labels.append(k)
-        row = [0, 0] + [''] * (len(labels)-2)
+        row = [''] * (len(labels))
         for i, k in enumerate(childLabels):
             row[labelIndexes[k]] = childRows[0][i]
         rows.append(row)
 
-    def _renderParseTree(name, level):
+    def _renderParseTree(name, level, path):
         "recursive parseTree-to-jsTree data renderer"
-        labelIndexes = dict(startLineNo=0, endLineNo=1, timestamp=2, threadID=3, threadName=4, module=5)
-        children, labels, row, rows = [], ["startLineNo", "endLineNo", "timestamp", "threadID", "threadName", "module"], [0, 0, '', '', '', ''], []
+        labelIndexes = dict(timestamp=0, threadID=1, threadName=2, module=3)
+        children, labels, row, rows = [], ["timestamp", "threadID", "threadName", "module"], ['', '', '', ''], []
+        metaPath = path.strip('.')
         if isinstance(level, dict):
             # first pass for leaf values
             rows = [row]
@@ -78,7 +79,7 @@ def index():
             # second pass for non-leafs
             for k in sorted(keys):
                 v = level[k]
-                child = _renderParseTree(k, v)
+                child = _renderParseTree(k, v, path + '.' + k)
                 if len(row) == 0 and len(_getRows(child)) == 1:
                     # no leaf-values at this level, accumulate any immediate child singleton rows into my row vector
                     rows = []
@@ -86,10 +87,11 @@ def index():
                 children.append(child)
             #
         else: # list
-            for v in level:
+            for i, v in enumerate(level):
                 # list top-level values always dicts
-                timestamp = v.get('timestamp')
-                child = _renderParseTree(timestamp, v)
+                elementPath = "%s.%03d" % (path, i)
+                label = parser.nodeMeta.get(elementPath.strip('.') + ".index", v.get('timestamp'))
+                child = _renderParseTree(label, v, elementPath)
                 if len(_getRows(child)) == 1:
                     # no leaf-values at this level, accumulate any immediate child singleton rows into my row vector
                     _mergeTableData(child, labelIndexes, labels, rows)
@@ -100,19 +102,20 @@ def index():
         node = dict(text=name, id=id)
         if children:
             node['children'] = children
-        # extract line bounds, always first two fields
-        startLineNo = min(row[0] for row in rows)
-        endLineNo = max(row[1] for row in rows)
-        # strip line-no fields  todo: there has to be a cleaner way than this, make lineNo metadata some side structure perhaps??
-        #labels = labels[2:]
-        #rows = [row[2:] for row in rows]
+        # extract line bounds from node metadata
+        startLineNo, endLineNo = parser.nodeMeta.get(metaPath + ".startLineNo", 0), parser.nodeMeta.get(metaPath + "endLineNo", 0)
+        # startLineNo = min(row[0] for row in rows)
+        # endLineNo = max(row[1] for row in rows)
+        # # strip line-no fields  todo: there has to be a cleaner way than this, make lineNo metadata some side structure perhaps??
+        # labels = labels[2:]
+        # rows = [row[2:] for row in rows]
         # save table data in side dict for later ajax calls
         nodeData[id] = dict(labels=labels, rows=rows, startLineNo=startLineNo, endLineNo=endLineNo)
         #
         return node
 
     # top-level jsTree roots are children of the top-level parseTree
-    renderedTree = _renderParseTree('top', parser.parseTree)['children']
+    renderedTree = _renderParseTree('top', parser.parseTree, '')['children']
 
     return render_template("index.html",
                            renderedParseTree=json.dumps(renderedTree))

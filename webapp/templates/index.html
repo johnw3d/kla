@@ -44,7 +44,6 @@
     <div > <!--data-spy="affix"> -->
         <i class="fa fa-slack fa-3x app-logo"></i>
         <div id="directory-tree">
-            directory tree goes here
         </div>
     </div>
 {% endblock %}
@@ -80,7 +79,7 @@
                         var logLineHeight = parseInt($(d.getElementById("log-pre")).css("line-height"));
                         var lines = $("#node-table-div").data();
                         if (lines.startline > 0)
-                            $("#log-frame")[0].contentWindow.scrollTo(0, logLineHeight * lines.startline);
+                            $("#log-frame")[0].contentWindow.scrollTo(0, logLineHeight * lines.startline - 2);
                     }
                     // display associated log section
                     //if (log != null) {
@@ -102,9 +101,11 @@
                             'data': data,
                             'themes': {
                                 'name': 'proton',
-                                'responsive': true
+                                'responsive': true,
+                                'variant': 'small'
                             }
-                        }
+                        },
+                        'plugins' : [ 'sort' ]
                     });
             // set up click handlers
             $(treeID).on("select_node.jstree", nodeClicked);
