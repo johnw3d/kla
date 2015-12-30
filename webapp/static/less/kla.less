@@ -52,6 +52,15 @@ h1 {
   border-width: 0;
 }
 
+.hidden {
+    visibility: hidden;
+    over-flow: hidden;
+    width: 0px;
+    height: 0px;
+}
+
+// main col components
+
 .node-table {
   th, td {
     padding: 3px;
@@ -66,8 +75,15 @@ h1 {
   }
 }
 
-textarea.log-lines {
+#log-textarea {
   font-size: 10px;
   width: 100%;
-  height: 20em;
+  height: 30em;
+  white-space: pre;
+}
+
+#log-frame {
+  pre {
+    font-size: 10px;
+  }
 }

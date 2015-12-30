@@ -1,4 +1,4 @@
-<div>
+<div id="node-table-div" data-startline="{{ startLineNo }}" data-endline="{{ endLineNo }}">
     <table class="node-table">
         {%  if rows|count == 1 %}
             <tbody>
@@ -28,7 +28,4 @@
             </tbody>
         {% endif %}
     </table>
-    <textarea class="log-lines">
-        {{ lines }}
-    </textarea>
 </div>

@@ -100,7 +100,7 @@ def index():
         node = dict(text=name, id=id)
         if children:
             node['children'] = children
-        # extract line-no bounds, always first two fields
+        # extract line bounds, always first two fields
         startLineNo = min(row[0] for row in rows)
         endLineNo = max(row[1] for row in rows)
         # strip line-no fields  todo: there has to be a cleaner way than this, make lineNo metadata some side structure perhaps??
@@ -141,8 +141,12 @@ def nodeDataTable(nodeID):
     "ajax call for table data for IDed node"
     nd = nodeData.get(nodeID, dict(labels=[], rows=[], startLineNo=0, endLineNo=0))
     return render_template("node_table.html",
-                           labels=nd["labels"],
-                           rows=nd["rows"],
-                           lines='\n'.join(parser.lines[nd["startLineNo"]-1:nd["endLineNo"]]),
-                           upperFirst=lambda x: x[0].upper() + x[1:])
+                           upperFirst=lambda x: x[0].upper() + x[1:],
+                           **nd)
+
+@kla.route('/log')
+def getLog():
+    "returns current client log as plain text"
+    return '<pre id="log-pre" style="font-size:10px">' + parser.log + '</pre>'
+
 

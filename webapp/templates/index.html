@@ -51,6 +51,11 @@
 
 {% block main_col %}
     <div id="main-col">
+        <div id="data-table-div"></div>
+        <div id="log-section-div">
+            <!-- <textarea id="log-textarea">Loading client log...</textarea> -->
+            <iframe id="log-frame" width="100%" height="300px" src="/log"></iframe>
+        </div>
     </div>
 {% endblock %}
 
@@ -59,6 +64,7 @@
     <script src="/static/dist/kla.js"></script>
     <script>
         var treeData = {{ renderedParseTree|safe }};
+        var log = null, logLineHeight = 0;
 
         // handle click on parseTree node
         function nodeClicked(e, data) {
@@ -66,7 +72,24 @@
                 url : '/node/' + data.node.id,
                 type: 'GET',
                 success: function(tableHtml){
-                    $('#main-col').html(tableHtml);
+                    // install returned data-table into main column
+                    $('#data-table-div').html(tableHtml);
+                    var d = $("#log-frame")[0].contentDocument;
+                    if (d) {
+                        // scroll to associated log section
+                        var logLineHeight = parseInt($(d.getElementById("log-pre")).css("line-height"));
+                        var lines = $("#node-table-div").data();
+                        if (lines.startline > 0)
+                            $("#log-frame")[0].contentWindow.scrollTo(0, logLineHeight * lines.startline);
+                    }
+                    // display associated log section
+                    //if (log != null) {
+                    //    var lineHeight =
+                    //    var lines = $("#node-table-div").data();
+                    //    if (lines.startline > 0)
+                    //        $("#log-frame")[0].contentWindow.scrollTo(0, logLineHeight * lines.startline);
+                    //        // $("#log-textarea").scrollTop(logLineHeight * lines.startline);
+                    //}
                 }
             });
         }
@@ -85,6 +108,19 @@
                     });
             // set up click handlers
             $(treeID).on("select_node.jstree", nodeClicked);
+            // launch log text load
+{#            $.ajax({#}
+{#                url : '/log',#}
+{#                type: 'GET',#}
+{#                success: function(text){#}
+{#                    log = text;#}
+{#                    setInterval(function() {#}
+{#                        $("#log-textarea").val(log);#}
+{#                        logLineHeight = parseInt($("#log-textarea").css("line-height"));#}
+{#                        // $("#log-section-div").removeClass("hidden");#}
+{#                    }, 1000);#}
+{#                }#}
+{#            });#}
         }
 
         $(window).load(function() {

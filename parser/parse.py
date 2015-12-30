@@ -42,7 +42,7 @@ class Parser(object):
     def __init__(self, logfileName, patternDef):
         self.logfileName = logfileName
         self.parseTree = ParseTree()
-        self.lines = []
+        self.log = None
         # each parser has it's own "compiled" pattern struct as it may contain logfile-specific
         #  {{var}} variable expansions
         self.patternSpec = PatternSpec(self, patternDef)
@@ -59,13 +59,15 @@ class Parser(object):
 
     def parse(self):
         "perform a parse on my logfile"
+        # grab log copy
         with open(self.logfileName) as logfile:
-            # read logfile line, match against pattern-spec
+            self.log = logfile.read()
+        # read logfile line-by-line, match against pattern-spec
+        with open(self.logfileName) as logfile:
             lineNo = 0
             line = logfile.readline()
             while line:
                 line = line.strip()
-                self.lines.append(line)
                 self.patternSpec.match(line, lineNo)
                 line = logfile.readline()
                 lineNo += 1
