@@ -47,12 +47,12 @@ def index():
         "merges child labels & row into parent labels & rows"
         childLabels, childRows = _getLabels(child), _getRows(child)
         newLabels = set(childLabels) - set(labels)
-        for k in sorted(newLabels):
-            labelIndexes[k] = len(labels)
-            labels.append(k)
+        for l in sorted(newLabels):
+            labelIndexes[l] = len(labels)
+            labels.append(l)
         row = [''] * (len(labels))
-        for i, k in enumerate(childLabels):
-            row[labelIndexes[k]] = childRows[0][i]
+        for i, l in enumerate(childLabels):
+            row[labelIndexes[l]] = childRows[0][i]
         rows.append(row)
 
     def _renderParseTree(name, level, path):
@@ -87,9 +87,11 @@ def index():
                 children.append(child)
             #
         else: # list
-            for i, v in enumerate(level):
+            #print("**", type(level), level)
+            for j, v in enumerate(level):
                 # list top-level values always dicts
-                elementPath = "%s.%03d" % (path, i)
+                elementPath = "%s.%03d" % (path, j)
+                #print(j, elementPath, v)
                 label = parser.nodeMeta.get(elementPath.strip('.') + ".index", v.get('timestamp'))
                 child = _renderParseTree(label, v, elementPath)
                 if len(_getRows(child)) == 1:

@@ -84,7 +84,7 @@ class Parser(object):
             keys = subtree.keys()
             # look for keys that are 3-digit ordinals
             if keys:
-                if any(self.ordinalRE.match(k) for k in keys):
+                if all(self.ordinalRE.match(k) for k in keys):
                     if False and len(keys) == 1:
                         # single entry, elide level
                         return optimize(subtree[list(keys)[0]])

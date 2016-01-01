@@ -60,6 +60,7 @@ class Pattern(object):
             expandedRegexp = self.mappedRegexp
             for field, val in self.watchFields.items():
                 expandedRegexp = expandedRegexp.replace('{{%s}}' % field, val)
+            #print(expandedRegexp)
             self.compiledRexep = re.compile(expandedRegexp)
         #
         return self.compiledRexep.match(line)
@@ -111,6 +112,7 @@ class PatternSpec(object):
         self.tasks = {}
         self.taskOrdinal = defaultdict(int)
         self.indexFields = {}
+        self.prefixMatches = {}
         self.patterns = []
         self.patternDef = patternDef
         self.compile()
@@ -144,8 +146,9 @@ class PatternSpec(object):
                 for k in ("start", "end", "patterns"):
                     for pat in defn.get(k, []):
                         self.patterns.append(Pattern(self.parser, taskPrefix + pat, taskName, isStart=(k == "start"), isEnd=(k == "end")))
-                # record index spec
+                # record index spec & prefix matches if any
                 self.indexFields[taskName] = defn.get("indexFields", [])
+                self.prefixMatches[taskName] = defn.get("prefixMatch", {})
                 # recurse into any subtasks
                 subtasks = defn.get("subtasks")
                 if subtasks:
@@ -154,12 +157,15 @@ class PatternSpec(object):
 
     def match(self, line, lineNo):
         "match line against my patterns"
-        # print("\n\n---------\n", line)
+        #print("\n\n---------\n", line)
         endTask = None
         for p in self.patterns:  # hey, optimize this into a single or-compounded re
             m = p.match(line)
             if m:
-                print("matched", p.taskName, line)
+                # apply any prefixMatch constraints
+                if any(m.group(pk).strip() != pv for pk, pv in self.prefixMatches[p.taskName].items()):
+                    continue
+                #print("matched", p.taskName, line)
                 # match, update task state & parse-tree
                 # grab current task for this pattern, bump if task-start pattern
                 taskName = p.taskName
@@ -193,7 +199,7 @@ class PatternSpec(object):
 
     def resetTaskTree(self, task):
         "reset the task tree under given task"
-        print("  resetting task tree", task.name)
+        #print("  resetting task tree", task.name)
         # import pprint
         # pprint.pprint(self.tasks, width=160)
         def _reset(task):
@@ -210,7 +216,7 @@ class PatternSpec(object):
         "clean up at end of parse"
         # close out any still open tasks
         for t in self.tasks.values():
-            self.parseTree[t.pathPrefix + 'endLineNo'] = lastLineNo
+            self.nodeMeta[t.pathPrefix + 'endLineNo'] = lastLineNo
 
 
 # class PatternManager(object):
