@@ -3,7 +3,7 @@
 #
 __author__ = 'johnw'
 
-import logging, json
+import logging, json, html
 
 from flask import (Flask, request, session, g, redirect, url_for,
      abort, render_template)
@@ -149,9 +149,68 @@ def nodeDataTable(nodeID):
                            upperFirst=lambda x: x[0].upper() + x[1:],
                            **nd)
 
-@kla.route('/log')
-def getLog():
+@kla.route('/clientlog')
+def getClientLog():
     "returns current client log as plain text"
-    return '<pre id="log-pre" style="font-size:10px">' + parser.log + '</pre>'
+    return '<pre id="log-pre" style="font-size:10px">' + html.escape(parser.log) + '</pre>'
 
+# ELK stack experiments
+from elasticsearch import Elasticsearch
+es = Elasticsearch(
+    [
+        'http://localhost:9200/',
+    ],
+)
 
+def loadELKStuff(es):
+    # grab index, type & host info
+    es_mapping = es.indices.get_mapping()
+    indices = list(es_mapping.keys())
+    #
+    srch = es.search(body={
+        "size": 0,
+        "aggs" : {
+            "logtypes" : {
+                "terms" : { "field" : "type" }
+            },
+            "hosts" : {
+                "terms" : { "field" : "host" }
+            }
+        }})
+
+    logs = {}
+    for doc in srch['aggregations']['logtypes']['buckets']:
+        logs[doc['key']] = doc['doc_count']
+    hosts = {}
+    for doc in srch['aggregations']['hosts']['buckets']:
+        hosts[doc['key']] = doc['doc_count']
+
+    return indices, logs, hosts
+
+indices, logs, hosts = loadELKStuff(es)
+
+@kla.route('/accesslogs')
+def accessLogs():
+    "server log-access page"
+    return render_template("log_access.html",
+                           indices=indices,
+                           logs=logs,
+                           hosts=hosts
+                           )
+
+@kla.route('/serverlogs', methods=['POST'])
+def serverLogs():
+    "return selected server logs html"
+    # extract log selection
+    logs = request.values["logs"].split("+")
+    hosts = request.values["hosts"].split("+")
+    interval = int(request.values["interval"])
+    dt = request.values["datetime"]
+    # determine available log/host/timewindow crosses
+
+    # display hosts within log-types
+    return render_template("log_frames.html",
+                           interval=interval,
+                           datetime=dt,
+                           logs=logtable
+                           )

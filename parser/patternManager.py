@@ -69,7 +69,7 @@ class Task(object):
     "represents an extracted task instance, maintains parsing state-machine for the task"
 
     def __init__(self, name, ordinal, indexFields, patternSpec):
-        print("creating task", name)
+        #print("creating task", name)
         self.name = baseName = name
         self.ordinal = ordinal
         self.indexFields = indexFields
@@ -82,7 +82,7 @@ class Task(object):
             baseName = path[-1]
             parent = patternSpec.tasks.get(parentName)
             if parent:
-                print("  wire parent", parentName)
+                #print("  wire parent", parentName)
                 self.parent = parent
                 parent.addChild(self)
             else:
@@ -90,7 +90,7 @@ class Task(object):
         # make the parseTree path-prefix
         self.pathPrefix = self.parent.pathPrefix if self.parent else ""
         self.pathPrefix += "%s.%03d." % (baseName, ordinal)
-        print("  pathPrefix", self.pathPrefix)
+        #print("  pathPrefix", self.pathPrefix)
 
     def addChild(self, child):
         "add child task"

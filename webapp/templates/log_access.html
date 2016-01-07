@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="/static/dist/jstree/themes/proton/style.css"/>
+{% endblock %}
+
+{% block nav_bar_content %}
+<div class="row" xmlns="http://www.w3.org/1999/html">
+        <div class="col-sm-3 left-col">
+            <!-- button type="button" class="btn btn-link btn-sm navbar-btn" title="Add a Fold">
+                <!-- <span class="glyphicon glyphicon-star"></span> Star -- >
+                <i id="add-fold-button" class="fa fa-lg fa-plus"></i>
+            </button -->
+            <span class="dropdown navbar-btn">
+              <button class="btn btn-link btn-sm dropdown-toggle" type="button" id="mainMenu1" data-toggle="dropdown">
+                <i id="main-menu-button" class="fa fa-lg fa-bars"></i>
+                <!--span class="caret"></span-->
+              </button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="mainMenu1">
+                <li><a id="add-a-link-link" href="/">Client Log Analysis</a></li>
+                <li><a id="add-a-link-link" href="/accesslogs">Server Log Access</a></li>
+              </ul>
+            </span>
+            <span class="navbar-right">
+                <button type="button" class="btn btn-link btn-sm navbar-btn" title="Search folds">
+                    <i class="fa fa-lg fa-search"></i>
+                </button>
+                <button type="button" class="btn btn-link btn-sm navbar-btn">
+                    <i class="fa fa-lg fa-bars"></i>
+                </button>
+            </span>
+        </div>
+        <div class="col-sm-9 main-col">
+            <span class="dropdown navbar-btn">
+              <button class="btn btn-link btn-sm dropdown-toggle" type="button" id="foldMenu1" data-toggle="dropdown">
+                <i id="add-to-fold-button" class="fa fa-lg fa-plus"></i>
+                <!--span class="caret"></span-->
+              </button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="foldMenu1">
+                <li><a id="add-a-link-link" href="#">Add a link</a></li>
+                <li><a id="add-a-post-link" href="#">Add a post</a></li>
+                <li><a id="add-a-feed-link" href="#">Add a feed</a></li>
+              </ul>
+            </span>
+            <button type="button" class="btn btn-link btn-sm navbar-btn navbar-right">
+                <!-- <span class="glyphicon glyphicon-star"></span> Star -->
+                <i class="fa fa-lg fa-bars"></i>
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block left_col %}
+    <div >
+        <i class="fa fa-slack fa-3x app-logo"></i>
+        <div id="log-list">
+            <h4>Logs</h4>
+            <table class="log-table">
+                {% for log in logs %}
+                    <tr>
+                        <td><input type="checkbox" id="log-{{log}}" class="log-check" data-logname="{{ log }}"/></td>
+                        <td>{{ log }}</td>
+                    </tr>
+                {%  endfor %}
+            </table>
+        </div>
+        <div id="host-list">
+            <h4>Hosts</h4>
+            <table class="log-table">
+                {% for host in hosts %}
+                    <tr>
+                        <td><input type="checkbox" class="host-check" data-hostname="{{ host }}"/></td>
+                        <td>{{ host }}</td>
+                    </tr>
+                {%  endfor %}
+            </table>
+        </div>
+        <div id="time-window">
+            <h4>Time window</h4>
+            <select class="form-control" name="interval" id="time-interval">
+                <option value="1" selected>1 minute</option>
+                <option value="5">5 minutes</option>
+                <option value="10">10 minute</option>
+                <option value="30">30 minute</option>
+                <option value="60">1 hour</option>
+            </select><br>
+            Starting at: <input type="datetime" id="window-datetime"/>
+        </div>
+    </div>
+{% endblock %}
+
+{% block main_col %}
+    <div id="main-col">
+        <div id="selected-logs"></div>
+    </div>
+{% endblock %}
+
+{% block page_scripts %}
+    <script src="/static/dist/kla.js"></script>
+    <script>
+
+        function host_log_check(e) {
+            // display selected logs & hosts
+            var logs = "";
+            $('.log-check').each(function() {
+                if ($(this)[0].checked)
+                    logs = logs + "+" + $(this).data("logname");
+            });
+            var hosts = "";
+            $('.host-check').each(function() {
+                if ($(this)[0].checked)
+                    hosts = hosts + "+" + $(this).data("hostname");
+            });
+            var interval = $("#time-interval").val(),
+                datetime = $("window-datetime").val();
+            $.ajax({
+                url: '/serverlogs',
+                type: 'POST',
+                data: {logs: logs, hosts: hosts, interval: interval, datetime: datetime},
+                success: function (logsHtml) {
+                    // install returned log list into main column
+                    $('#selected-logs').html(logsHtml);
+                }
+            });
+        }
+        $(window).load(function() {
+            $(function () {
+                $(".host-check,.log-check").on("change", host_log_check);
+            });
+        });
+    </script>
+
+{% endblock %}
+
+

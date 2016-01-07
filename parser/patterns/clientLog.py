@@ -51,15 +51,14 @@ patternDef = {
                         }
                     },
                     "end":  [ r'ZPeerDirsrvTracer::run dirsrv trace done' ],
+                },
+                "listeners": {
+                    "prefix": r'(?P<module>PEER     )',
+                    "start": [ r'(?P<name>KHTTPServer): (?P<address>.*)',
+                                  r'(?P<name>ZPeerListener)::start listening on port (?P<port>.*)',
+                                  r'(?P<name>RTMPServer) listening on (?P<address>.*)'],
+                    "indexFields": ["name"]
                 }
-                # "dirsrvTrace.pings": {
-                #     "threadName": "ZPeerDirSrvTra",
-                #     "prefix": r'(?P<module>PEER_DST |ZPING    )',
-                #     "start": [ r'ZPeerDirsrvTracer::run - start dirsrv traceRoute', ],
-                #     "patterns": [ r'ZPing ICMP addr=(?P<addr>[0-9\.]+), maxHops=(?P<maxHops>\d+), replyfrom:(?P<replyfrom>[0-9\.]+), rtt=(?P<rtt>[^,]+), status=(?P<status>.*)',],
-                #     "indexFields": ["replyfrom"],
-                #     "end":  [ r'ZPeerDirsrvTracer::run dirsrv trace done' ],
-                # }
             }
         },
         "peer": {
@@ -72,3 +71,5 @@ patternDef = {
     }
 }
 
+# PEER     KHTTPServer: http://127.0.0.1:31013
+# RTMPServer listening on rtmp://127.0.0.1:31014
