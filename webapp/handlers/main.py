@@ -145,13 +145,13 @@ def index():
 def nodeDataTable(nodeID):
     "ajax call for table data for IDed node"
     nd = nodeData.get(nodeID, dict(labels=[], rows=[], startLineNo=0, endLineNo=0))
-    return render_template("node_table.html",
+    return render_template("ajax/node_table.html",
                            upperFirst=lambda x: x[0].upper() + x[1:],
                            **nd)
 
 @kla.route('/clientlog')
 def getClientLog():
-    "returns current client log as plain text"
+    "ajax: returns current client log as plain text"
     return '<pre id="log-pre" style="font-size:10px">' + html.escape(parser.log) + '</pre>'
 
 # ELK stack experiments
@@ -165,7 +165,7 @@ es = Elasticsearch(
 def loadELKStuff(es):
     # grab index, type & host info
     es_mapping = es.indices.get_mapping()
-    indices = list(es_mapping.keys())
+    indices = sorted(es_mapping.keys())
     #
     srch = es.search(body={
         "size": 0,
@@ -192,15 +192,20 @@ indices, logs, hosts = loadELKStuff(es)
 @kla.route('/accesslogs')
 def accessLogs():
     "server log-access page"
+    # as a first hack, extract available dates from index names of the form logstash-2015.01.01
+    fromDate = indices[0].split('-')[-1].replace('.','/')
+    toDate = indices[-1].split('-')[-1].replace('.','/')
     return render_template("log_access.html",
                            indices=indices,
                            logs=logs,
-                           hosts=hosts
+                           hosts=hosts,
+                           fromDate=fromDate,
+                           toDate=toDate
                            )
 
 @kla.route('/serverlogs', methods=['POST'])
 def serverLogs():
-    "return selected server logs html"
+    "ajax: return selected server logs html"
     # extract log selection
     logs = request.values["logs"].split("+")
     hosts = request.values["hosts"].split("+")
@@ -208,8 +213,9 @@ def serverLogs():
     dt = request.values["datetime"]
     # determine available log/host/timewindow crosses
 
+
     # display hosts within log-types
-    return render_template("log_frames.html",
+    return render_template("ajax/log_frames.html",
                            interval=interval,
                            datetime=dt,
                            logs=logtable

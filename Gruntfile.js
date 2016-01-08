@@ -30,7 +30,9 @@ module.exports = function(grunt) {
               'jquery-ui/themes/smoothness/jquery-ui.min.css',
               'font-awesome/fonts/**',
               //'jsTree/dist/jstree.min.js'
-              'jsTree/dist/jstree.js'  // for dev
+              'jsTree/dist/jstree.js',  // for dev
+              'datetimepicker/jquery.datetimepicker.css',
+              'datetimepicker/jquery.datetimepicker.js'
             ],
             dest: './webapp/static/dist/',
             filter: 'isFile',

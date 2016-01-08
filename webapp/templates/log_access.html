@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block styles %}
-    <link rel="stylesheet" type="text/css" href="/static/dist/jstree/themes/proton/style.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/dist/jquery.datetimepicker.css"/>
 {% endblock %}
 
 {% block nav_bar_content %}
@@ -77,14 +77,20 @@
         </div>
         <div id="time-window">
             <h4>Time window</h4>
-            <select class="form-control" name="interval" id="time-interval">
+            <p>Available dates: {{ fromDate }} - {{ toDate }}</p>
+            <p>Interval: <select class="form-control" name="interval" id="time-interval">
                 <option value="1" selected>1 minute</option>
                 <option value="5">5 minutes</option>
                 <option value="10">10 minute</option>
                 <option value="30">30 minute</option>
                 <option value="60">1 hour</option>
-            </select><br>
-            Starting at: <input type="datetime" id="window-datetime"/>
+            </select></p>
+            <p>
+                Starting at: <input type="text" id="window-datetime"/>
+            </p>
+            <p>
+                <input type="button" id="retrieve-button" value="Retrieve" disabled style="width:100%"/>
+            </p>
         </div>
     </div>
 {% endblock %}
@@ -97,9 +103,10 @@
 
 {% block page_scripts %}
     <script src="/static/dist/kla.js"></script>
+    <script src="/static/dist/jquery.datetimepicker.js"></script>
     <script>
 
-        function host_log_check(e) {
+        function retrieve_logs(e) {
             // display selected logs & hosts
             var logs = "";
             $('.log-check').each(function() {
@@ -125,7 +132,13 @@
         }
         $(window).load(function() {
             $(function () {
-                $(".host-check,.log-check").on("change", host_log_check);
+                $("#retrieve-button").on("clicked", retrieve_logs);
+                $('#window-datetime').datetimepicker({
+                    startDate: '{{ fromDate }}',
+                    onChangeDateTime: function() {
+                        $("#retrieve-button").removeAttr("disabled");
+                    }
+                });
             });
         });
     </script>
