@@ -119,11 +119,11 @@
                     hosts = hosts + "+" + $(this).data("hostname");
             });
             var interval = $("#time-interval").val(),
-                datetime = $("window-datetime").val();
+                datetime = $("#window-datetime").val();
             $.ajax({
                 url: '/serverlogs',
                 type: 'POST',
-                data: {logs: logs, hosts: hosts, interval: interval, datetime: datetime},
+                data: { logs: logs, hosts: hosts, interval: interval, datetime: datetime },
                 success: function (logsHtml) {
                     // install returned log list into main column
                     $('#selected-logs').html(logsHtml);
@@ -132,7 +132,7 @@
         }
         $(window).load(function() {
             $(function () {
-                $("#retrieve-button").on("clicked", retrieve_logs);
+                $("#retrieve-button").on("click", retrieve_logs);
                 $('#window-datetime').datetimepicker({
                     startDate: '{{ fromDate }}',
                     onChangeDateTime: function() {

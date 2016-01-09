@@ -3,7 +3,7 @@
 #
 __author__ = 'johnw'
 
-import logging, json, html
+import logging, json, html, datetime
 
 from flask import (Flask, request, session, g, redirect, url_for,
      abort, render_template)
@@ -165,7 +165,9 @@ es = Elasticsearch(
 def loadELKStuff(es):
     # grab index, type & host info
     es_mapping = es.indices.get_mapping()
-    indices = sorted(es_mapping.keys())
+    indices = sorted(i for i in es_mapping.keys() if i.startswith('logstash-'))
+    # as a first hack, extract available dates from index names of the form logstash-2015.01.01
+    dates = [i.split('-')[-1].replace('.', '/') for i in indices]
     #
     srch = es.search(body={
         "size": 0,
@@ -185,22 +187,19 @@ def loadELKStuff(es):
     for doc in srch['aggregations']['hosts']['buckets']:
         hosts[doc['key']] = doc['doc_count']
 
-    return indices, logs, hosts
+    return indices, dates, logs, hosts
 
-indices, logs, hosts = loadELKStuff(es)
+indices, dates, logs, hosts = loadELKStuff(es)
 
 @kla.route('/accesslogs')
 def accessLogs():
     "server log-access page"
-    # as a first hack, extract available dates from index names of the form logstash-2015.01.01
-    fromDate = indices[0].split('-')[-1].replace('.','/')
-    toDate = indices[-1].split('-')[-1].replace('.','/')
     return render_template("log_access.html",
                            indices=indices,
                            logs=logs,
                            hosts=hosts,
-                           fromDate=fromDate,
-                           toDate=toDate
+                           fromDate=dates[0],
+                           toDate=dates[-1]
                            )
 
 @kla.route('/serverlogs', methods=['POST'])
@@ -209,9 +208,14 @@ def serverLogs():
     # extract log selection
     logs = request.values["logs"].split("+")
     hosts = request.values["hosts"].split("+")
-    interval = int(request.values["interval"])
+    datetime.timedelta(minutes=int(request.values["interval"]))
     dt = request.values["datetime"]
+    fromDate = datetime.datetime.strptime(dt, "%Y/%m/%d %H:%M")
+    toDate = fromDate + dt
     # determine available log/host/timewindow crosses
+    srch = es.search(body={
+
+    })
 
 
     # display hosts within log-types
