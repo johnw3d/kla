@@ -67,9 +67,22 @@ patternDef = {
                           r'ZPeerKDPReceiver::ZPeerKDPReceiver: KDP using port (?P<kdpPort>\d+)',
                           r'Addr and Grid Policy: noderef=\[(?P<noderef>.*)\]'
                           ],
+        },
+        "download": {
+            "prefix": r'(?P<module>DMGR     |PEER     )     ',
+            "start": [ r'selecting moid for download: (?P<moid>[0-9a-f\-]+).*', ],
+            "patterns": [
+                r'ZPeer::stream\((?P<moid>[0-9a-f\-]+)\) ready to stream',
+                r'ZPeerProtoLoaderZBBP::progress started moid=(?P<moid>[0-9a-f\-]+) nodeid=(?P<nodeID>[0-9a-zA-Z]+) \((?P<bytes>\d+) bytes\)',
+            ],
+            "end":  [ r'ZPeer:endLoad for moid=(?P<moid>[0-9a-f\-]+) reports:(?P<endLoadReport>\w+).*' ],
         }
     }
 }
 
 # PEER     KHTTPServer: http://127.0.0.1:31013
 # RTMPServer listening on rtmp://127.0.0.1:31014
+#[57b4]ZUserDownload  [Nov 24 19:43:41] DMGR     selecting moid for download: 6174a797-ba2c-291f-bfde-dc2ed217cfc1
+#Th-0                 [Nov 24 20:53:48] PEER     ZPeer:endLoad for moid=6174a797-ba2c-291f-bfde-dc2ed217cfc1 reports:ZPEER_ABANDONED
+#[57b4]ZUserDownload  [Nov 24 19:43:42] PEER     ZPeer::stream(6174a797-ba2c-291f-bfde-dc2ed217cfc1) ready to stream
+#[24a0]L1             [Nov 24 19:45:04] PEER     ZPeerProtoLoaderZBBP::progress started moid=6174a797-ba2 nodeid=g5hxp7CNcvON (4073601 bytes)

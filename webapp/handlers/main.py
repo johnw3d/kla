@@ -189,7 +189,7 @@ def loadELKStuff(es):
 
     return indices, dates, logs, hosts
 
-indices, dates, logs, hosts = loadELKStuff(es)
+# indices, dates, logs, hosts = loadELKStuff(es)
 
 @kla.route('/accesslogs')
 def accessLogs():
