@@ -4,6 +4,7 @@
 __author__ = 'johnw'
 
 import logging, json, html, datetime
+from collections import defaultdict
 
 from flask import (Flask, request, session, g, redirect, url_for,
      abort, render_template)
@@ -171,12 +172,12 @@ def loadELKStuff(es):
     #
     srch = es.search(body={
         "size": 0,
-        "aggs" : {
-            "logtypes" : {
-                "terms" : { "field" : "type" }
+        "aggs": {
+            "logtypes": {
+                "terms": { "field": "type.raw" }
             },
-            "hosts" : {
-                "terms" : { "field" : "host" }
+            "hosts": {
+                "terms": { "field": "host.raw" }
             }
         }})
 
@@ -189,7 +190,7 @@ def loadELKStuff(es):
 
     return indices, dates, logs, hosts
 
-# indices, dates, logs, hosts = loadELKStuff(es)
+indices, dates, logs, hosts = loadELKStuff(es)
 
 @kla.route('/accesslogs')
 def accessLogs():
@@ -208,42 +209,92 @@ def serverLogs():
     # extract log selection
     logs = request.values["logs"].split("+")
     hosts = request.values["hosts"].split("+")
-    dt = datetime.timedelta(minutes=int(request.values["interval"]))
-    fromDate = datetime.datetime.strptime(request.values["datetime"], "%Y/%m/%d %H:%M")
+    interval = int(request.values["interval"])
+    date = request.values["datetime"]
+    dt = datetime.timedelta(minutes=interval)
+    fromDate = datetime.datetime.strptime(date, "%Y/%m/%d %H:%M")
     toDate = fromDate + dt
     # determine available log/host/timewindow crosses
-    logtable = {}
+    logtable = defaultdict(list)
     for log in logs:
-        srch = es.search(body={
-            "size": 0,
-            "aggs" : {
-                "logtypes" : {
-                    "filter": {
-                        "bool" : {
-                            "must" : [
-                                { "term" : { "type" : log }},
-                                { "range" : {
-                                    "@timestamp" : {
-                                        "gte": fromDate.isoformat(),
-                                        "lt": toDate.isoformat()
-                                    }
-                                }}
-                            ]
-                        }
-                    },
-                    "aggs" : {
-                        "hosts" : {
-                            "terms" : { "field" : "host" }
+        if log:
+            srch = es.search(body={
+                "size": 0,
+                "aggs": {
+                    "logtypes": {
+                        "filter": {
+                            "bool": {
+                                "must": [
+                                    { "term": { "type": log }},
+                                    { "terms": { "host.raw": hosts }},
+                                    { "range": {
+                                        "@timestamp": {
+                                            "gte": fromDate.isoformat(),
+                                            "lt": toDate.isoformat()
+                                        }
+                                    }}
+                                ]
+                            }
+                        },
+                        "aggs": {
+                            "hosts": {
+                                "terms": { "field": "host.raw" }
+                            }
                         }
                     }
                 }
-            }
-        })
-
+            })
+            # pick up hosts with entries for this log in given time-window
+            if srch['aggregations']['logtypes']['doc_count'] > 0:
+                for doc in srch['aggregations']['logtypes']['hosts']['buckets']:
+                    host = doc['key']
+                    if host in hosts: # todo: wtf, terms: { "host": hosts } fails to filter on hosts list??
+                        logtable[log].append(doc['key'])
 
     # display hosts within log-types
     return render_template("ajax/log_frames.html",
                            interval=interval,
-                           datetime=dt,
+                           fromDate=date,
                            logs=logtable
                            )
+
+@kla.route('/serverlog/<log>/<host>')
+def getServerLog(log, host):
+    "ajax: returns selected server log as plain text"
+    
+    interval = int(request.args.get("i"))
+    date = request.args.get("d")
+    dt = datetime.timedelta(minutes=interval)
+    fromDate = datetime.datetime.strptime(date, "%Y/%m/%d %H:%M")
+    toDate = fromDate + dt
+
+    srch = es.search(body={
+    	"size": 100,
+        "query": {
+            "filtered": {
+                "filter": {
+                    "bool" : {
+                        "must" : [
+                            { "term" : { "type" : log }},
+                            { "term" : { "host.raw" : host }},
+                            { "range": {
+                                "@timestamp": {
+                                    "gte": fromDate.isoformat(),
+                                    "lt": toDate.isoformat()
+                                }
+                            }}
+                        ]
+                    }
+                }
+            }
+        },
+        "sort": [ "@timestamp" ],
+        "fields": [ "message" ]
+    })
+
+    lines = ""
+    for h in srch["hits"]["hits"]:
+        lines += h["fields"]["message"][0] + '\n'
+
+    return '<pre id="log-pre" style="font-size:10px">' + html.escape(lines) + '</pre>'
+
