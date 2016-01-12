@@ -159,7 +159,8 @@ def getClientLog():
 from elasticsearch import Elasticsearch
 es = Elasticsearch(
     [
-        'http://localhost:9200/',
+        #'http://localhost:9200/',
+        'http://tc1-elk.esjc.kontiki.com:9200/',
     ],
 )
 
@@ -188,7 +189,7 @@ def loadELKStuff(es):
     for doc in srch['aggregations']['hosts']['buckets']:
         hosts[doc['key']] = doc['doc_count']
 
-    return indices, dates, logs, hosts
+    return indices, dates, sorted(logs), sorted(hosts)
 
 indices, dates, logs, hosts = loadELKStuff(es)
 

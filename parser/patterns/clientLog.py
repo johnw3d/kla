@@ -9,7 +9,7 @@
 __author__ = 'john'
 
 patternDef = {
-    "prefix": r'^(\[?(?P<threadID>([a-f0-9]+)|(Th-0))\]?)*(?P<threadName>[a-zA-Z ]+)\[(?P<timestamp>\w+ \d+ \d+:\d+:\d+)\]\s*',
+    "prefix": r'^(\[?(?P<threadID>([a-f0-9]+)|(Th-0))\]?)*(?P<threadName>[a-zA-Z0-9 ]+)\[(?P<timestamp>\w+ \d+ \d+:\d+:\d+)\]\s*',
     "tasks": {
         "network": {
             "subtasks": {
@@ -69,12 +69,18 @@ patternDef = {
                           ],
         },
         "download": {
-            "prefix": r'(?P<module>DMGR     |PEER     )     ',
+            "prefix": r'(?P<module>DMGR     |PEER     )',
             "start": [ r'selecting moid for download: (?P<moid>[0-9a-f\-]+).*', ],
-            "patterns": [
-                r'ZPeer::stream\((?P<moid>[0-9a-f\-]+)\) ready to stream',
-                r'ZPeerProtoLoaderZBBP::progress started moid=(?P<moid>[0-9a-f\-]+) nodeid=(?P<nodeID>[0-9a-zA-Z]+) \((?P<bytes>\d+) bytes\)',
-            ],
+            "subtasks": {
+                "progress": {
+                    "prefix": r'(?P<module>PEER     )',
+                    "start": [ r'ZPeerProtoLoaderZBBP::progress started moid=(?P<moid>[0-9a-f\-]+) nodeid=(?P<nodeID>[0-9a-zA-Z]+) \((?P<bytes>\d+) bytes\)', ],
+                }
+            },
+            # "patterns": [
+            #     r'ZPeer::stream\((?P<moid>[0-9a-f\-]+)\) ready to stream',
+            #     r'ZPeerProtoLoaderZBBP::progress started moid=(?P<moid>[0-9a-f\-]+) nodeid=(?P<nodeID>[0-9a-zA-Z]+) \((?P<bytes>\d+) bytes\)',
+            # ],
             "end":  [ r'ZPeer:endLoad for moid=(?P<moid>[0-9a-f\-]+) reports:(?P<endLoadReport>\w+).*' ],
         }
     }

@@ -49,6 +49,9 @@ class Pattern(object):
                     name = True
                 self.mappedRegexp += s
 
+    def __repr__(self):
+        return self.mappedRegexp
+
     def fieldChanged(self, parseTree, field, val):
         "handle notification that a watched field value is changing"
         self.watchFields[field] = re.escape(str(val))
