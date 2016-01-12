@@ -208,14 +208,37 @@ def serverLogs():
     # extract log selection
     logs = request.values["logs"].split("+")
     hosts = request.values["hosts"].split("+")
-    datetime.timedelta(minutes=int(request.values["interval"]))
-    dt = request.values["datetime"]
-    fromDate = datetime.datetime.strptime(dt, "%Y/%m/%d %H:%M")
+    dt = datetime.timedelta(minutes=int(request.values["interval"]))
+    fromDate = datetime.datetime.strptime(request.values["datetime"], "%Y/%m/%d %H:%M")
     toDate = fromDate + dt
     # determine available log/host/timewindow crosses
-    srch = es.search(body={
-
-    })
+    logtable = {}
+    for log in logs:
+        srch = es.search(body={
+            "size": 0,
+            "aggs" : {
+                "logtypes" : {
+                    "filter": {
+                        "bool" : {
+                            "must" : [
+                                { "term" : { "type" : log }},
+                                { "range" : {
+                                    "@timestamp" : {
+                                        "gte": fromDate.isoformat(),
+                                        "lt": toDate.isoformat()
+                                    }
+                                }}
+                            ]
+                        }
+                    },
+                    "aggs" : {
+                        "hosts" : {
+                            "terms" : { "field" : "host" }
+                        }
+                    }
+                }
+            }
+        })
 
 
     # display hosts within log-types
