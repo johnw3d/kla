@@ -3,7 +3,7 @@
         <h4>{{ log }}</h4>
         {% for host in hosts %}
             <h5>{{ host }}</h5>
-            <iframe id="{{ log }}-{{ host }}-log-frame" width="100%" height="400px" src="/serverlog/{{log}}/{{host}}?d={{fromDate}}&i={{interval}}"></iframe>
+            <iframe id="{{ log }}-{{ host }}-log-frame" width="100%" height="400px" src="/serverlog/{{log}}/{{host}}?d={{fromDate}}&i={{interval}}&f={{filter}}"></iframe>
         {% endfor %}
     {% endfor %}
 </div>

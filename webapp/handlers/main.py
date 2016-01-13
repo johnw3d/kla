@@ -256,6 +256,7 @@ def serverLogs():
     return render_template("ajax/log_frames.html",
                            interval=interval,
                            fromDate=date,
+                           filter=request.values["filter"],
                            logs=logtable
                            )
 
@@ -268,6 +269,20 @@ def getServerLog(log, host):
     dt = datetime.timedelta(minutes=interval)
     fromDate = datetime.datetime.strptime(date, "%Y/%m/%d %H:%M")
     toDate = fromDate + dt
+    filter = request.args.get("f")
+
+    filterTerms = [
+        { "term": { "type" : log }},
+        { "term": { "host.raw" : host }},
+        { "range": {
+            "@timestamp": {
+                "gte": fromDate.isoformat(),
+                "lt": toDate.isoformat()
+            }
+        }}
+    ]
+    if filter:
+        filterTerms.append({ "term": { "message": filter }})
 
     srch = es.search(body={
     	"size": 100,
@@ -275,16 +290,7 @@ def getServerLog(log, host):
             "filtered": {
                 "filter": {
                     "bool" : {
-                        "must" : [
-                            { "term" : { "type" : log }},
-                            { "term" : { "host.raw" : host }},
-                            { "range": {
-                                "@timestamp": {
-                                    "gte": fromDate.isoformat(),
-                                    "lt": toDate.isoformat()
-                                }
-                            }}
-                        ]
+                        "must" : filterTerms
                     }
                 }
             }

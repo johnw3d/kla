@@ -91,7 +91,7 @@
                 Starting at: <input type="text" id="window-datetime"/>
             </p>
             <p>
-                Filter: <input type="text" width="100%" id="filter-string"/>
+                Filter: <input type="text" id="filter-string"/>
             </p>
             <p>
                 <input type="button" id="retrieve-button" value="Retrieve" disabled style="width:100%"/>
@@ -124,11 +124,12 @@
                     hosts = hosts + "+" + $(this).data("hostname");
             });
             var interval = $("#time-interval").val(),
-                datetime = $("#window-datetime").val();
+                datetime = $("#window-datetime").val(),
+                filter = $("#filter-string").val();
             $.ajax({
                 url: '/serverlogs',
                 type: 'POST',
-                data: { logs: logs, hosts: hosts, interval: interval, datetime: datetime },
+                data: { logs: logs, hosts: hosts, interval: interval, datetime: datetime, filter: filter },
                 success: function (logsHtml) {
                     // install returned log list into main column
                     $('#selected-logs').html(logsHtml);
