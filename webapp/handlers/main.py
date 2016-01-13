@@ -3,7 +3,7 @@
 #
 __author__ = 'johnw'
 
-import logging, json, html, datetime
+import logging, json, html, datetime, pprint
 from collections import defaultdict
 
 from flask import (Flask, request, session, g, redirect, url_for,
@@ -159,8 +159,8 @@ def getClientLog():
 from elasticsearch import Elasticsearch
 es = Elasticsearch(
     [
-        #'http://localhost:9200/',
-        'http://tc1-elk.esjc.kontiki.com:9200/',
+        'http://localhost:9200/',
+        #'http://tc1-elk.esjc.kontiki.com:9200/',
     ],
 )
 
@@ -281,10 +281,9 @@ def getServerLog(log, host):
             }
         }}
     ]
-    if filter:
-        filterTerms.append({ "term": { "message": filter }})
-
-    srch = es.search(body={
+    if False and filter:
+        filterTerms.append({ "regexp": { "log_message": filter.lower() }})
+    body = {
     	"size": 100,
         "query": {
             "filtered": {
@@ -297,11 +296,16 @@ def getServerLog(log, host):
         },
         "sort": [ "@timestamp" ],
         "fields": [ "message" ]
-    })
+    }
+    #pprint.pprint(body)
+
+    srch = es.search(body=body)
 
     lines = ""
     for h in srch["hits"]["hits"]:
-        lines += h["fields"]["message"][0] + '\n'
+        line = h["fields"]["message"][0]
+        if not filter or filter in line:
+            lines += line + '\n'
 
     return '<pre id="log-pre" style="font-size:10px">' + html.escape(lines) + '</pre>'
 
