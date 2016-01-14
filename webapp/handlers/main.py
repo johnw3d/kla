@@ -256,6 +256,7 @@ def serverLogs():
     return render_template("ajax/log_frames.html",
                            interval=interval,
                            fromDate=date,
+                           toDate=toDate,
                            filter=request.values["filter"],
                            logs=logtable
                            )

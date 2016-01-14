@@ -140,10 +140,17 @@
             $(function () {
                 $("#retrieve-button").on("click", retrieve_logs);
                 $('#window-datetime').datetimepicker({
-                    startDate: '{{ fromDate }}',
+                    minDate: '{{ fromDate }}',
+                    maxDate: '{{ toDate }}',
+                    onShow: function(currentTime, input) {
+                        var x = currentTime,
+                                y = input;
+                        console.log(x);
+                    },
                     onChangeDateTime: function() {
                         $("#retrieve-button").removeAttr("disabled");
-                    }
+                    },
+                    closeOnDateSelect: true
                 });
             });
         });
