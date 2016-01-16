@@ -139,12 +139,14 @@
         $(window).load(function() {
             $(function () {
                 $("#retrieve-button").on("click", retrieve_logs);
-                var picker;
-                picker = $('#window-datetime').datetimepicker({
+                $('#window-datetime').datetimepicker({
                     minDate: '{{ fromDate }}',
                     maxDate: '{{ toDate }}',
                     defaultDate: '{{ toDate }} 00:00',
                     // format: 'Y/m/d ',
+                    onChangeDateTime: function() {
+                        $("#retrieve-button").removeAttr("disabled");
+                    }
                     closeOnDateSelect: true
                 });
             });
